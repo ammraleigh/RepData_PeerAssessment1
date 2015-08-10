@@ -105,29 +105,6 @@ output:
         names(byInterval) <- c("Interval", "timeframe", "AverageNoSteps")
         index <- with(byInterval, order(byInterval$AverageNoSteps, decreasing = TRUE))
         
-#         myData2Weekend <- subset(myData2, timeframe == "weekend")
-#         myData2Weekday <- subset(myData2, timeframe == "weekday")
-        
-#         byIntervalWeekend <- aggregate(myData2Weekend$steps, by=list(myData2Weekend$interval), FUN=mean)
-#         names(byIntervalWeekend) <- c("Interval", "AverageNoSteps")
-#         index <- with(byIntervalWeekend, order(byIntervalWeekend$AverageNoSteps, decreasing = TRUE))
-#         
-#         byIntervalWeekday <- aggregate(myData2Weekday$steps, by=list(myData2Weekday$interval), FUN=mean)
-#         names(byIntervalWeekday) <- c("Interval", "AverageNoSteps")
-#         index <- with(byIntervalWeekday, order(byIntervalWeekday$AverageNoSteps, decreasing = TRUE))
-        
-#         myTitle <- "Daily Activity Pattern"
-#         xMinMax <- c(0,2400)
-#         
-#         yMinMaxWeekend <- c(0,max(byIntervalWeekend$AverageNoSteps + 25))
-#         yMinMaxWeekday <- c(0,max(byIntervalWeekday$AverageNoSteps + 25))
-#         
-#         yMinMax <- yMinMaxWeekday
-#         
-#         if(max(byIntervalWeekend$AverageNoSteps) > max(byIntervalWeekday$AverageNoSteps)) {
-#                 yMinMax <- yMinMaxWeekend
-#         }
-        
         library(ggplot2)
         ggplot(byInterval, aes(byInterval$Interval, byInterval$AverageNoSteps)) +
                            xlab("Interval") +
@@ -136,17 +113,6 @@ output:
                            scale_x_continuous(breaks = seq(0, 2400, by=100)) +
                            facet_wrap(~timeframe, nrow=2) + 
                            theme(axis.text.x = element_text(angle = 90, hjust = 1))
-        
-#         plot(xMinMax,yMinMax, main = myTitle, type="n", pch="|", xlab = "Time Interval", ylab = "Steps", xaxt="n")
-#         axis(1, at = seq(0, 2400, by = 100), las=2)
-#         lines(byIntervalWeekend$Interval, byIntervalWeekend$AverageNoSteps, col = "black", lwd=1)
-#         lines(byIntervalWeekday$Interval, byIntervalWeekday$AverageNoSteps, col = "blue", lwd=1)
-#         legend("topright", legend = c("Weekend", "Weekday"), lty=c(1,1), lwd=c(2.5,2.5), col=c("black", "blue"), cex = .75)
-#         
-#         abline(v = byIntervalWeekday[index,][1,1], col = "blue", lwd = 2, lty = 2 )
-#         myLineAnnotation <- paste("Max Avg Steps =", round(byIntervalWeekday[index,][1,2], digits=0), " \r\n @ Interval =", byIntervalWeekday[index,][1,1])
-#         
-#         text(1300, 203, myLineAnnotation, cex = .65, col = "blue")
         
         summary(byInterval)
 
