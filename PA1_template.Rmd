@@ -5,21 +5,149 @@ output:
     keep_md: true
 ---
 
+## 1 Loading and preprocessing the data
 
-## Loading and preprocessing the data
+```{r}
+  myData <- read.csv("activity.csv", na.strings = "NA", header = TRUE)
+  myData <- subset(myData, steps != "NA")  ## remove rows with "Not Available" data
+  myData <- as.data.frame(lapply(myData,function (y) if(class(y)=="factor" ) as.character(y) else y),stringsAsFactors=F)
+  myData$date <- as.Date(substr(myData$date,1,10), "%Y-%m-%d") ## Convert character Date to Date object
+  strMyData <- str(myData)
 
+```
 
+`r strMyData`
 
-## What is mean total number of steps taken per day?
+## 2 What is mean total number of steps taken per day?
 
+```{r}
+  byDay <- aggregate(myData$steps, by=list(myData$date), FUN=mean)
+  names(byDay) <- c("Date", "AverageNoSteps")
+  myTitle <- paste("Steps per Day Removing NAs (mean=", round(mean(byDay$AverageNoSteps, na.rm = TRUE), digits = 2), ")" )
+  histInfo <- (hist(byDay$AverageNoSteps, breaks=25, main = myTitle, xlab = "Steps", xlim=c(0,80), ylim=c(0, 14)))
+  abline(v = mean(byDay$AverageNoSteps, na.rm = TRUE), col = "blue", lwd = 2)
+  summary(byDay)
+```
 
+## 3 What is the average daily activity pattern?
 
-## What is the average daily activity pattern?
+```{r}
 
+  byInterval <- aggregate(myData$steps, by=list(myData$interval), FUN=mean)
+  names(byInterval) <- c("Interval", "AverageNoSteps")
+  index <- with(byInterval, order(byInterval$AverageNoSteps, decreasing = TRUE))
+  myTitle <- "Daily Activity Pattern"
+  plot(byInterval$Interval, byInterval$AverageNoSteps, main = myTitle, type="l", pch="|", xlab = "Time Interval", ylab = "Steps", xaxt="n")
+  axis(1, at = seq(0, 2400, by = 100), las=2)
+  abline(v = byInterval[index,][1,1], col = "blue", lwd = 2 )
+  myLineAnnotation <- paste("Max Avg Steps =", round(byInterval[index,][1,2], digits=0), " @ Interval =", byInterval[index,][1,1])
+  text(1500, 200, myLineAnnotation)
+  summary(byInterval)
+```
 
+## 4 Inputing missing values
 
-## Imputing missing values
+```{r}
+        myData2 <- read.csv("activity.csv", na.strings = "NA", header = TRUE)
+        myData2 <- as.data.frame(lapply(myData2,function (y) if(class(y)=="factor" ) as.character(y) else y),stringsAsFactors=F)
+        myData2$date <- as.Date(substr(myData2$date,1,10), "%Y-%m-%d")
+        
+        rowTotal1 <- nrow(myData2)
+        rowComplete1 <- as.integer(sum(as.numeric(complete.cases(myData2))))
+        rowDiff1 <- rowTotal1-rowComplete1
+        rowStepsWithNA1 <- sum(as.numeric(is.na(myData2$steps)))
+        
+        for(i in 1:nrow(myData2)){
+                if (is.na(myData2$steps[i])) {
+                        if (length(byDay$AverageNoSteps[byDay$Date == myData2$date[i]]) != 0) {
+                                myData2$steps[i] <- byDay$AverageNoSteps[byDay$Date == myData2$date[i]]
+                        }
+                        else { myData2$steps[i] = 0 }                        
+                }
+        }
+        
+        rowTotal2 <- nrow(myData2)
+        rowComplete2 <- as.integer(sum(as.numeric(complete.cases(myData2))))
+        rowDiff2 <- rowTotal2-rowComplete2
+        rowStepsWithNA2 <- sum(as.numeric(is.na(myData2$steps)))
+        
+        byDayAfter <- aggregate(myData2$steps, by=list(myData2$date), FUN=mean)
+        myTitle <- paste("Steps per Day Adjusting NA Data (mean=", round(mean(byDayAfter$x, na.rm = TRUE), digits = 2), ")" )
+        histInfo <- (hist(byDayAfter$x, breaks=25, main = myTitle, xlab = "Steps", xlim=c(0,80), ylim=c(0, 14)))
+        abline(v = mean(byDayAfter$x, na.rm = TRUE), col = "blue", lwd = 2)
+        summary(byDayAfter)   
+          
+  
+```
 
+  Data statistics *before* adjusting for missing values (ignoring missing values) - 
 
+  - Number of incomplete rows:  total number of rows - number of complete rows = `r rowTotal1` - `r rowComplete1` = `r rowDiff1`  
+  - Number of rows with 'steps == NA':  `r rowStepsWithNA1`
+  - Average steps :  `r summary(byDay$AverageNoSteps)[4]` 
+  - Median steps :  `r summary(byDay$AverageNoSteps)[3]` 
 
-## Are there differences in activity patterns between weekdays and weekends?
+  Data statistics *after* adjusting missing values - 
+  
+  - Number of incomplete rows:  total number of rows - number of complete rows = `r rowTotal2` - `r rowComplete2` = `r rowDiff2`  
+  - Number of rows with 'steps == NA':  `r rowStepsWithNA2`
+  - Average steps :  `r summary(byDayAfter$x)[4]`  
+  - Median steps :  `r summary(byDayAfter$x)[3]`  
+
+## 5 Differences in activity patterns between weekdays and weekends
+
+```{r}
+
+        myData2$timeframe <- ifelse((weekdays(myData2$date) == c("Saturday")) | (weekdays(myData2$date) == c("Sunday")),"weekend", "weekday")
+        myData2$timeframe <- factor(myData2$timeframe)
+        
+        byInterval <- aggregate(myData2$steps, by=list(myData2$interval, myData2$timeframe), FUN=mean)
+        names(byInterval) <- c("Interval", "timeframe", "AverageNoSteps")
+        index <- with(byInterval, order(byInterval$AverageNoSteps, decreasing = TRUE))
+        
+#         myData2Weekend <- subset(myData2, timeframe == "weekend")
+#         myData2Weekday <- subset(myData2, timeframe == "weekday")
+        
+#         byIntervalWeekend <- aggregate(myData2Weekend$steps, by=list(myData2Weekend$interval), FUN=mean)
+#         names(byIntervalWeekend) <- c("Interval", "AverageNoSteps")
+#         index <- with(byIntervalWeekend, order(byIntervalWeekend$AverageNoSteps, decreasing = TRUE))
+#         
+#         byIntervalWeekday <- aggregate(myData2Weekday$steps, by=list(myData2Weekday$interval), FUN=mean)
+#         names(byIntervalWeekday) <- c("Interval", "AverageNoSteps")
+#         index <- with(byIntervalWeekday, order(byIntervalWeekday$AverageNoSteps, decreasing = TRUE))
+        
+#         myTitle <- "Daily Activity Pattern"
+#         xMinMax <- c(0,2400)
+#         
+#         yMinMaxWeekend <- c(0,max(byIntervalWeekend$AverageNoSteps + 25))
+#         yMinMaxWeekday <- c(0,max(byIntervalWeekday$AverageNoSteps + 25))
+#         
+#         yMinMax <- yMinMaxWeekday
+#         
+#         if(max(byIntervalWeekend$AverageNoSteps) > max(byIntervalWeekday$AverageNoSteps)) {
+#                 yMinMax <- yMinMaxWeekend
+#         }
+        
+        library(ggplot2)
+        ggplot(byInterval, aes(byInterval$Interval, byInterval$AverageNoSteps)) +
+                           xlab("Interval") +
+                           ylab("Number of Steps") +
+                           geom_line() +
+                           scale_x_continuous(breaks = seq(0, 2400, by=100)) +
+                           facet_wrap(~timeframe, nrow=2) + 
+                           theme(axis.text.x = element_text(angle = 90, hjust = 1))
+        
+#         plot(xMinMax,yMinMax, main = myTitle, type="n", pch="|", xlab = "Time Interval", ylab = "Steps", xaxt="n")
+#         axis(1, at = seq(0, 2400, by = 100), las=2)
+#         lines(byIntervalWeekend$Interval, byIntervalWeekend$AverageNoSteps, col = "black", lwd=1)
+#         lines(byIntervalWeekday$Interval, byIntervalWeekday$AverageNoSteps, col = "blue", lwd=1)
+#         legend("topright", legend = c("Weekend", "Weekday"), lty=c(1,1), lwd=c(2.5,2.5), col=c("black", "blue"), cex = .75)
+#         
+#         abline(v = byIntervalWeekday[index,][1,1], col = "blue", lwd = 2, lty = 2 )
+#         myLineAnnotation <- paste("Max Avg Steps =", round(byIntervalWeekday[index,][1,2], digits=0), " \r\n @ Interval =", byIntervalWeekday[index,][1,1])
+#         
+#         text(1300, 203, myLineAnnotation, cex = .65, col = "blue")
+        
+        summary(byInterval)
+
+```
