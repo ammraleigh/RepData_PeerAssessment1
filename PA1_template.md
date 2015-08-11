@@ -1,4 +1,9 @@
-# Reproducible Research: Peer Assessment 1
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
 
 ## 1 Loading and preprocessing the data
 
@@ -31,7 +36,7 @@
   abline(v = mean(byDay$AverageNoSteps, na.rm = TRUE), col = "blue", lwd = 2)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
 
 ```r
   summary(byDay)
@@ -62,7 +67,7 @@
   text(1500, 200, myLineAnnotation)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
 
 ```r
   summary(byInterval)
@@ -111,7 +116,7 @@
         abline(v = mean(byDayAfter$x, na.rm = TRUE), col = "blue", lwd = 2)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
 
 ```r
         summary(byDayAfter)   
@@ -169,7 +174,7 @@
                            theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
 
 ```r
         summary(byInterval)
