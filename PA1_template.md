@@ -86,6 +86,14 @@
 
 ## 4 Inputing missing values
 
+The activity data contained missing steps values reported as NA in the dataset. The strategy to use and include this data is:
+
+ - Located the steps fields with missing data (NA)
+ - Update the steps field data with the average steps per day
+ 
+The purpose of this exercise is to determine if including this information has an affect on the mean and median statistics when missing
+data is *NOT* included.
+
 
 ```r
         myData2 <- read.csv("activity.csv", na.strings = "NA", header = TRUE)
@@ -138,12 +146,12 @@ Data statistics *before* adjusting for missing values (ignoring missing values) 
         
         Data statistics *after* adjusting missing values - 
                 
-                - Number of incomplete rows:  total number of rows - number of complete rows = 17568 - 17568 = 0  
+        - Number of incomplete rows:  total number of rows - number of complete rows = 17568 - 17568 = 0  
         - Number of rows with 'steps == NA':  0
         - Average steps :  1.077\times 10^{4}  
         - Median steps :  1.076\times 10^{4} 
         
-The mean and median are the same for both datasets.
+The mean and median are the same for both datasets, not including missing data has no affect on the dataset's mean and median statistics.
 
 ## 5 Differences in activity patterns between weekdays and weekends
 
