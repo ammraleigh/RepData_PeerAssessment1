@@ -123,6 +123,12 @@ img {
 </div>
 <div id="inputing-missing-values" class="section level2">
 <h2>4 Inputing missing values</h2>
+<p>The activity data contained missing steps values reported as NA in the dataset. The strategy to use and include this data is:</p>
+<ul>
+<li>Located the steps fields with missing data (NA)</li>
+<li>Update the steps field data with the average steps per day</li>
+</ul>
+<p>The purpose of this exercise is to determine if including this information has an affect on the mean and median statistics when missing data is <em>NOT</em> included.</p>
 <pre class="r"><code>        myData2 &lt;- read.csv(&quot;activity.csv&quot;, na.strings = &quot;NA&quot;, header = TRUE)
         myData2 &lt;- as.data.frame(lapply(myData2,function (y) if(class(y)==&quot;factor&quot; ) as.character(y) else y),stringsAsFactors=F)
         myData2$date &lt;- as.Date(substr(myData2$date,1,10), &quot;%Y-%m-%d&quot;)
@@ -163,12 +169,12 @@ img {
     
     Data statistics *after* adjusting missing values - 
             
-            - Number of incomplete rows:  total number of rows - number of complete rows = 17568 - 17568 = 0  
+    - Number of incomplete rows:  total number of rows - number of complete rows = 17568 - 17568 = 0  
     - Number of rows with 'steps == NA':  0
     - Average steps :  1.077\times 10^{4}  
     - Median steps :  1.076\times 10^{4} 
     </code></pre>
-<p>The mean and median are the same for both datasets.</p>
+<p>The mean and median are the same for both datasets, not including missing data has no affect on the dataset’s mean and median statistics.</p>
 </div>
 <div id="differences-in-activity-patterns-between-weekdays-and-weekends" class="section level2">
 <h2>5 Differences in activity patterns between weekdays and weekends</h2>
